@@ -1,11 +1,10 @@
 .idea/
 venv/
 .venv/
-db.sqlite3
 *.pyc
 .vscode
 node_modules
 package-lock.json
 project
-
+identifier.sqlite
 
