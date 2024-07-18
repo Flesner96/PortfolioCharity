@@ -55,7 +55,7 @@ ROOT_URLCONF = 'PortfolioCharity.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [BASE_DIR / 'donation/templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
