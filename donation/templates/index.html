@@ -3,47 +3,11 @@
 {% block title %}Strona Główna{% endblock %}
 
 {% block nav_actions %}
-<li><a href="" class="btn btn--small btn--without-border">Zaloguj</a></li>
-<li><a href="#" class="btn btn--small btn--highlighted">Załóż konto</a></li>
-{% endblock %}
-
-{% block nav_links %}
-<li><a href="" class="btn btn--without-border active">Start</a></li>
-<li><a href="#steps" class="btn btn--without-border">O co chodzi?</a></li>
-<li><a href="#about-us" class="btn btn--without-border">O nas</a></li>
-<li><a href="#help" class="btn btn--without-border">Fundacje i organizacje</a></li>
-<li><a href="form.html" class="btn btn--without-border">Przekaż dary</a></li>
-<li><a href="#contact" class="btn btn--without-border">Kontakt</a></li>
-{% endblock %}
-
-{% block slogan %}
-<div class="slogan container container--90">
-    <div class="slogan--item">
-        <h1>
-            Zacznij pomagać!<br />
-            Oddaj niechciane rzeczy w zaufane ręce
-        </h1>
-    </div>
-</div>
+<li><a href="{% url 'login' %}" class="btn btn--small btn--without-border">Zaloguj</a></li>
+<li><a href="{% url 'register' %}" class="btn btn--small btn--highlighted">Załóż konto</a></li>
 {% endblock %}
 
 {% block content %}
-<section id="stats" class="stats">
-    <div class="container container--85">
-        <div class="stats--item">
-            <em>{{ total_bags }}</em>
-            <h3>Oddanych worków</h3>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius est beatae, quod accusamus illum tempora!</p>
-        </div>
-
-        <div class="stats--item">
-            <em>{{ total_institutions }}</em>
-            <h3>Wspartych organizacji</h3>
-            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laboriosam magnam, sint nihil cupiditate quas quam.</p>
-        </div>
-    </div>
-</section>
-
 <section id="steps" class="steps">
     <h2>Wystarczą 4 proste kroki</h2>
     <div class="steps--container">
@@ -68,7 +32,7 @@
             <p>kurier przyjedzie w dogodnym terminie</p>
         </div>
     </div>
-    <a href="#" class="btn btn--large">Załóż konto</a>
+    <a href="{% url 'register' %}" class="btn btn--large">Załóż konto</a>
 </section>
 
 <section id="about-us" class="about-us">
@@ -116,15 +80,14 @@
                 <div class="col"><div class="text">ubrania, jedzenie, ciepłe koce</div></div>
             </li>
         </ul>
-        <!-- Pagination
-        <ul class="help--slides-pagination">
-            <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="3">3</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="4">4</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="5">5</a></li>
-        </ul>
-        -->
+        <!-- Pagination -->
+{#        <ul class="help--slides-pagination">#}
+{#            <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="3">3</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="4">4</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="5">5</a></li>#}
+{#        </ul>#}
     </div>
 
     <!-- SLIDE 2 -->
@@ -160,15 +123,14 @@
                 <div class="col"><div class="text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</div></div>
             </li>
         </ul>
-        <!-- Pagination
-        <ul class="help--slides-pagination">
-            <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="3">3</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="4">4</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="5">5</a></li>
-        </ul>
-        -->
+        <!-- Pagination -->
+{#        <ul class="help--slides-pagination">#}
+{#            <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="3">3</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="4">4</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="5">5</a></li>#}
+{#        </ul>#}
     </div>
 
     <!-- SLIDE 3 -->
@@ -190,12 +152,11 @@
                 <div class="col"><div class="text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</div></div>
             </li>
         </ul>
-        <!-- Pagination
-        <ul class="help--slides-pagination">
-            <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>
-            <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>
-        </ul>
-        -->
+        <!-- Pagination -->
+{#        <ul class="help--slides-pagination">#}
+{#            <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>#}
+{#            <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>#}
+{#        </ul>#}
     </div>
 </section>
 {% endblock %}

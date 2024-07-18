@@ -3,16 +3,8 @@
 {% block title %}Rejestracja{% endblock %}
 
 {% block nav_actions %}
-<li><a href="#">Zaloguj</a></li>
-<li class="highlighted"><a href="#">Załóż konto</a></li>
-{% endblock %}
-
-{% block nav_links %}
-<li><a href="#">Start</a></li>
-<li><a href="#">O co chodzi?</a></li>
-<li><a href="#">O nas</a></li>
-<li><a href="#">Fundacje i organizacje</a></li>
-<li><a href="#">Kontakt</a></li>
+<li><a href="{% url 'login' %}">Zaloguj</a></li>
+<li class="highlighted"><a href="{% url 'register' %}">Załóż konto</a></li>
 {% endblock %}
 
 {% block content %}
@@ -35,7 +27,7 @@
             <input type="password" name="password2" placeholder="Powtórz hasło">
         </div>
         <div class="form-group form-group--buttons">
-            <a href="login.html" class="btn btn--without-border">Zaloguj się</a>
+            <a href="{% url 'login' %}" class="btn btn--without-border">Zaloguj się</a>
             <button class="btn" type="submit">Załóż konto</button>
         </div>
     </form>
