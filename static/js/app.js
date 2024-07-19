@@ -61,11 +61,31 @@ document.addEventListener("DOMContentLoaded", function() {
      */
     changePage(e) {
       e.preventDefault();
-      const page = e.target.dataset.page;
+      const $btn = e.target;
+      const page = $btn.getAttribute("href").split("=")[1];
 
-      console.log(page);
+      console.log(page); // logowanie numeru strony
+
+      // Pobranie danych za pomocą AJAX
+      fetch(`${window.location.pathname}?page_${this.getSlideType()}=${page}`)
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newContent = doc.querySelector(`.help--slides[data-id="${this.currentSlide}"]`);
+          const currentContent = this.$el.querySelector(`.help--slides[data-id="${this.currentSlide}"]`);
+          currentContent.innerHTML = newContent.innerHTML;
+        })
+        .catch(error => console.error('Błąd:', error));
+    }
+
+    getSlideType() {
+      if (this.currentSlide == "1") return "fundations";
+      if (this.currentSlide == "2") return "organizations";
+      if (this.currentSlide == "3") return "collections";
     }
   }
+
   const helpSection = document.querySelector(".help");
   if (helpSection !== null) {
     new Help(helpSection);
