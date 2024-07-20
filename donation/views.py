@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.db.models import Sum
-from donation.models import Bag, Institution
+from donation.models import Bag, Institution, Category, Donation
 from django.urls import reverse
 
 
@@ -39,29 +41,6 @@ class LandingPage(View):
         return render(request, 'index.html', context)
 
 
-class AddDonation(View):
-    def get(self, request):
-        return render(request, 'form.html')
-
-
-class Login(View):
-    def get(self, request):
-        return render(request, 'login.html')
-
-    def post(self, request):
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-
-        user = authenticate(request, username=email, password=password)
-        if user is not None:
-            auth_login(request, user)
-            return redirect(reverse('landing-page'))
-        else:
-            if not User.objects.filter(username=email).exists():
-                return redirect(reverse('register'))
-            return render(request, 'login.html', {'error': 'Nieprawidłowy email lub hasło.'})
-
-
 class Register(View):
     def get(self, request):
         return render(request, 'register.html')
@@ -87,6 +66,66 @@ class Register(View):
         return redirect(reverse('login'))
 
 
+class Login(View):
+    def get(self, request):
+        return render(request, 'login.html')
+
+    def post(self, request):
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            auth_login(request, user)
+            return redirect(reverse('landing-page'))
+        else:
+            if not User.objects.filter(username=email).exists():
+                return redirect(reverse('register'))
+            return render(request, 'login.html', {'error': 'Nieprawidłowy email lub hasło.'})
+
+
 def logout_view(request):
     logout(request)
     return redirect(reverse('landing-page'))
+
+
+@method_decorator(login_required, name='dispatch')
+class AddDonationView(View):
+    def get(self, request):
+        categories = Category.objects.all()
+        institutions = Institution.objects.all()
+        return render(request, 'form.html', {'categories': categories, 'institutions': institutions})
+
+
+class FormConfirmationView(View):
+    def post(self, request):
+        user = request.user
+        categories = request.POST.getlist('categories')
+        bags = request.POST.get('bags')
+        organization_id = request.POST.get('organization')
+        organization = Institution.objects.get(id=organization_id)
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        zip_code = request.POST.get('postcode')
+        phone = request.POST.get('phone')
+        pick_up_date = request.POST.get('data')
+        pick_up_time = request.POST.get('time')
+        pick_up_comment = request.POST.get('more_info')
+
+        donation = Donation.objects.create(
+            user=user,
+            institution=organization,
+            address=address,
+            city=city,
+            zip_code=zip_code,
+            phone_number=phone,
+            pick_up_date=pick_up_date,
+            pick_up_time=pick_up_time,
+            quantity=bags,
+            pick_up_comment=pick_up_comment
+        )
+
+        donation.categories.set(categories)
+        donation.save()
+
+        return render(request, 'form-confirmation.html')

@@ -217,6 +217,9 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener("click", e => {
           e.preventDefault();
           this.currentStep++;
+          if (this.currentStep === 5) {
+            this.collectSummaryData();
+          }
           this.updateForm();
         });
       });
@@ -254,7 +257,88 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
       this.$step.parentElement.hidden = this.currentStep >= 6;
 
+      // Filter institutions based on selected categories
+      if (this.currentStep == 3) {
+        const selectedCategories = [...this.$form.querySelectorAll('[data-step="1"] input[type="checkbox"]:checked')]
+          .map(input => input.value);
+
+        console.log('Selected Categories:', selectedCategories);
+
+        this.$form.querySelectorAll('.institution').forEach(institution => {
+          const institutionCategories = institution.dataset.categories.split(',');
+          console.log('Institution Categories:', institutionCategories);
+          const isVisible = selectedCategories.some(category => institutionCategories.includes(category));
+          institution.style.display = isVisible ? 'block' : 'none';
+        });
+      }
+
       // TODO: get data from inputs and show them in summary
+    }
+
+    /**
+     * Collect data from the form and show them in summary
+     */
+    collectSummaryData() {
+      const summary = {
+        categories: [],
+        bags: this.$form.querySelector('input[name="bags"]').value,
+        organization: this.$form.querySelector('input[name="organization"]:checked') ?
+          this.$form.querySelector('input[name="organization"]:checked').nextElementSibling.querySelector('.title').innerText.trim() : '',
+        address: {
+          street: this.$form.querySelector('input[name="address"]').value,
+          city: this.$form.querySelector('input[name="city"]').value,
+          postcode: this.$form.querySelector('input[name="postcode"]').value,
+          phone: this.$form.querySelector('input[name="phone"]').value,
+        },
+        pickup: {
+          date: this.$form.querySelector('input[name="data"]').value,
+          time: this.$form.querySelector('input[name="time"]').value,
+          more_info: this.$form.querySelector('textarea[name="more_info"]').value,
+        },
+      };
+
+      this.$form.querySelectorAll('[data-step="1"] input[type="checkbox"]:checked').forEach(input => {
+        summary.categories.push(input.nextElementSibling.nextElementSibling.innerText.trim());
+      });
+
+      console.log('Summary:', summary);
+
+      // Update the summary view
+      const summaryContainer = this.$form.querySelector('.summary');
+      summaryContainer.innerHTML = `
+        <div class="form-section">
+          <h4>Oddajesz:</h4>
+          <ul>
+            <li>
+              <span class="icon icon-bag"></span>
+              <span class="summary--text">${summary.bags} worki ${summary.categories.join(', ')}</span>
+            </li>
+            <li>
+              <span class="icon icon-hand"></span>
+              <span class="summary--text">Dla fundacji ${summary.organization}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="form-section form-section--columns">
+          <div class="form-section--column">
+            <h4>Adres odbioru:</h4>
+            <ul>
+              <li>${summary.address.street}</li>
+              <li>${summary.address.city}</li>
+              <li>${summary.address.postcode}</li>
+              <li>${summary.address.phone}</li>
+            </ul>
+          </div>
+          <div class="form-section--column">
+            <h4>Termin odbioru:</h4>
+            <ul>
+              <li>${summary.pickup.date}</li>
+              <li>${summary.pickup.time}</li>
+              <li>${summary.pickup.more_info}</li>
+            </ul>
+          </div>
+        </div>
+      `;
     }
 
     /**
