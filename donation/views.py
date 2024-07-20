@@ -96,36 +96,53 @@ class AddDonationView(View):
         institutions = Institution.objects.all()
         return render(request, 'form.html', {'categories': categories, 'institutions': institutions})
 
-
-class FormConfirmationView(View):
     def post(self, request):
-        user = request.user
-        categories = request.POST.getlist('categories')
+        # Logowanie danych formularza
+        print(request.POST)
+
         bags = request.POST.get('bags')
         organization_id = request.POST.get('organization')
-        organization = Institution.objects.get(id=organization_id)
         address = request.POST.get('address')
         city = request.POST.get('city')
-        zip_code = request.POST.get('postcode')
+        postcode = request.POST.get('postcode')
         phone = request.POST.get('phone')
         pick_up_date = request.POST.get('data')
         pick_up_time = request.POST.get('time')
         pick_up_comment = request.POST.get('more_info')
+        categories = request.POST.getlist('categories')
 
+        print(
+            f"Bags: {bags}, Organization ID: {organization_id}, Address: {address}, City: {city}, Postcode: {postcode}, Phone: {phone}, Pick Up Date: {pick_up_date}, Pick Up Time: {pick_up_time}, Pick Up Comment: {pick_up_comment}, Categories: {categories}")
+
+        # Pobranie instytucji i kategorii
+        try:
+            institution = Institution.objects.get(id=organization_id)
+            categories_objects = Category.objects.filter(id__in=categories)
+        except Institution.DoesNotExist:
+            print("Institution not found")
+            return redirect('add-donation')
+
+        # Utworzenie nowej darowizny
         donation = Donation.objects.create(
-            user=user,
-            institution=organization,
+            quantity=bags,
+            institution=institution,
             address=address,
-            city=city,
-            zip_code=zip_code,
             phone_number=phone,
+            city=city,
+            zip_code=postcode,
             pick_up_date=pick_up_date,
             pick_up_time=pick_up_time,
-            quantity=bags,
-            pick_up_comment=pick_up_comment
+            pick_up_comment=pick_up_comment,
+            user=request.user,
         )
 
-        donation.categories.set(categories)
+        # Dodanie kategorii do darowizny
+        donation.categories.set(categories_objects)
         donation.save()
 
+        return redirect('form-confirmation')
+
+
+class FormConfirmationView(View):
+    def get(self, request):
         return render(request, 'form-confirmation.html')

@@ -299,7 +299,11 @@ document.addEventListener("DOMContentLoaded", function() {
       // Pobierz wybrane organizacje
       const organizationInput = this.$form.querySelector('input[name="organization"]:checked');
       if (organizationInput) {
-        const organizationTitle = organizationInput.nextElementSibling.querySelector('.title');
+        console.log('organizationInput:', organizationInput);
+        const organizationDescription = organizationInput.nextElementSibling.nextElementSibling;
+        console.log('organizationDescription:', organizationDescription);
+        const organizationTitle = organizationDescription ? organizationDescription.querySelector('.title') : null;
+        console.log('organizationTitle:', organizationTitle);
         if (organizationTitle) {
           summary.organization = organizationTitle.innerText.trim();
         }
