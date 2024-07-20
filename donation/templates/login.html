@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="login-page">
+<section id="login-page" class="login-page">
     <h2>Zaloguj się</h2>
     <form>
         <div class="form-group">
@@ -24,4 +24,15 @@
         </div>
     </form>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const target = document.getElementById("login-page");
+        if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+        }
+    });
+</script>
 {% endblock %}

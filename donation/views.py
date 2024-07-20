@@ -1,9 +1,10 @@
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.db.models import Sum
 from donation.models import Bag, Institution
-
+from django.urls import reverse
 
 class LandingPage(View):
     def get(self, request):
@@ -47,3 +48,23 @@ class Login(View):
 class Register(View):
     def get(self, request):
         return render(request, 'register.html')
+
+    def post(self, request):
+        name = request.POST.get('name')
+        surname = request.POST.get('surname')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+        if password != password2:
+            return render(request, 'register.html', {'error': 'Hasła muszą być takie same.'})
+
+        if User.objects.filter(username=email).exists():
+            return render(request, 'register.html', {'error': 'Użytkownik o podanym adresie email już istnieje.'})
+
+        user = User.objects.create_user(username=email, email=email, password=password)
+        user.first_name = name
+        user.last_name = surname
+        user.save()
+
+        return redirect(reverse('login'))
