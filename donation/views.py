@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
@@ -6,17 +7,16 @@ from django.db.models import Sum
 from donation.models import Bag, Institution
 from django.urls import reverse
 
+
 class LandingPage(View):
     def get(self, request):
         total_bags = Bag.objects.aggregate(Sum('quantity'))['quantity__sum'] or 0
         total_institutions = Institution.objects.count()
 
-        # Pobieranie instytucji z bazy danych i dodanie sortowania
         fundations_list = Institution.objects.filter(type='fundacja').order_by('id')
         organizations_list = Institution.objects.filter(type='organizacja pozarządowa').order_by('id')
         collections_list = Institution.objects.filter(type='zbiórka lokalna').order_by('id')
 
-        # Paginacja
         paginator_fundations = Paginator(fundations_list, 5)
         paginator_organizations = Paginator(organizations_list, 5)
         paginator_collections = Paginator(collections_list, 5)
@@ -37,13 +37,30 @@ class LandingPage(View):
             'collections': collections,
         }
         return render(request, 'index.html', context)
+
+
 class AddDonation(View):
     def get(self, request):
         return render(request, 'form.html')
 
+
 class Login(View):
     def get(self, request):
         return render(request, 'login.html')
+
+    def post(self, request):
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            auth_login(request, user)
+            return redirect(reverse('landing-page'))
+        else:
+            if not User.objects.filter(username=email).exists():
+                return redirect(reverse('register'))
+            return render(request, 'login.html', {'error': 'Nieprawidłowy email lub hasło.'})
+
 
 class Register(View):
     def get(self, request):
