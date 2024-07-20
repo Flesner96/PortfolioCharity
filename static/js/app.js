@@ -282,20 +282,36 @@ document.addEventListener("DOMContentLoaded", function() {
       const summary = {
         categories: [],
         bags: this.$form.querySelector('input[name="bags"]').value,
-        organization: this.$form.querySelector('input[name="organization"]:checked') ?
-          this.$form.querySelector('input[name="organization"]:checked').nextElementSibling.querySelector('.title').innerText.trim() : '',
+        organization: '',
         address: {
-          street: this.$form.querySelector('input[name="address"]').value,
-          city: this.$form.querySelector('input[name="city"]').value,
-          postcode: this.$form.querySelector('input[name="postcode"]').value,
-          phone: this.$form.querySelector('input[name="phone"]').value,
+          street: '',
+          city: '',
+          postcode: '',
+          phone: '',
         },
         pickup: {
-          date: this.$form.querySelector('input[name="data"]').value,
-          time: this.$form.querySelector('input[name="time"]').value,
-          more_info: this.$form.querySelector('textarea[name="more_info"]').value,
+          date: '',
+          time: '',
+          more_info: '',
         },
       };
+
+      // Pobierz wybrane organizacje
+      const organizationInput = this.$form.querySelector('input[name="organization"]:checked');
+      if (organizationInput) {
+        const organizationTitle = organizationInput.nextElementSibling.querySelector('.title');
+        if (organizationTitle) {
+          summary.organization = organizationTitle.innerText.trim();
+        }
+      }
+
+      summary.address.street = this.$form.querySelector('input[name="address"]').value;
+      summary.address.city = this.$form.querySelector('input[name="city"]').value;
+      summary.address.postcode = this.$form.querySelector('input[name="postcode"]').value;
+      summary.address.phone = this.$form.querySelector('input[name="phone"]').value;
+      summary.pickup.date = this.$form.querySelector('input[name="data"]').value;
+      summary.pickup.time = this.$form.querySelector('input[name="time"]').value;
+      summary.pickup.more_info = this.$form.querySelector('textarea[name="more_info"]').value;
 
       this.$form.querySelectorAll('[data-step="1"] input[type="checkbox"]:checked').forEach(input => {
         summary.categories.push(input.nextElementSibling.nextElementSibling.innerText.trim());
