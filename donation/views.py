@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
@@ -85,3 +85,8 @@ class Register(View):
         user.save()
 
         return redirect(reverse('login'))
+
+
+def logout_view(request):
+    logout(request)
+    return redirect(reverse('landing-page'))
