@@ -7,6 +7,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Institution(models.Model):
     FUNDACJA = 'fundacja'
     ORGANIZACJA_POZARZADOWA = 'organizacja pozarządowa'
@@ -24,10 +25,14 @@ class Institution(models.Model):
         choices=TYPE_CHOICES,
         default=FUNDACJA,
     )
-    categories = models.ManyToManyField(Category)
+    categories = models.ManyToManyField('Category')
+
+    class Meta:
+        verbose_name = 'Instytucja'
+        verbose_name_plural = 'Instytucje'
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.get_type_display()})"
 
 class Donation(models.Model):
     quantity = models.PositiveIntegerField()
