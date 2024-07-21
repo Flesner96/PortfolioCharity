@@ -97,50 +97,46 @@ class AddDonationView(View):
         return render(request, 'form.html', {'categories': categories, 'institutions': institutions})
 
     def post(self, request):
-        # Logowanie danych formularza
-        print(request.POST)
-
-        bags = request.POST.get('bags')
-        organization_id = request.POST.get('organization')
-        address = request.POST.get('address')
-        city = request.POST.get('city')
-        postcode = request.POST.get('postcode')
-        phone = request.POST.get('phone')
-        pick_up_date = request.POST.get('data')
-        pick_up_time = request.POST.get('time')
-        pick_up_comment = request.POST.get('more_info')
-        categories = request.POST.getlist('categories')
-
-        print(
-            f"Bags: {bags}, Organization ID: {organization_id}, Address: {address}, City: {city}, Postcode: {postcode}, Phone: {phone}, Pick Up Date: {pick_up_date}, Pick Up Time: {pick_up_time}, Pick Up Comment: {pick_up_comment}, Categories: {categories}")
-
-        # Pobranie instytucji i kategorii
         try:
+            bags = request.POST.get('bags')
+            organization_id = request.POST.get('organization')
+            address = request.POST.get('address')
+            city = request.POST.get('city')
+            postcode = request.POST.get('postcode')
+            phone = request.POST.get('phone')
+            pick_up_date = request.POST.get('data')
+            pick_up_time = request.POST.get('time')
+            pick_up_comment = request.POST.get('more_info')
+            categories = request.POST.getlist('categories')
+
+            # Pobranie instytucji i kategorii
             institution = Institution.objects.get(id=organization_id)
             categories_objects = Category.objects.filter(id__in=categories)
+
+            # Utworzenie nowej darowizny
+            donation = Donation.objects.create(
+                quantity=bags,
+                institution=institution,
+                address=address,
+                phone_number=phone,
+                city=city,
+                zip_code=postcode,
+                pick_up_date=pick_up_date,
+                pick_up_time=pick_up_time,
+                pick_up_comment=pick_up_comment,
+                user=request.user,
+            )
+
+            # Dodanie kategorii do darowizny
+            donation.categories.set(categories_objects)
+            donation.save()
+
+            return redirect('form-confirmation')
+
         except Institution.DoesNotExist:
-            print("Institution not found")
             return redirect('add-donation')
-
-        # Utworzenie nowej darowizny
-        donation = Donation.objects.create(
-            quantity=bags,
-            institution=institution,
-            address=address,
-            phone_number=phone,
-            city=city,
-            zip_code=postcode,
-            pick_up_date=pick_up_date,
-            pick_up_time=pick_up_time,
-            pick_up_comment=pick_up_comment,
-            user=request.user,
-        )
-
-        # Dodanie kategorii do darowizny
-        donation.categories.set(categories_objects)
-        donation.save()
-
-        return redirect('form-confirmation')
+        except Exception as e:
+            return render(request, 'form.html', {'categories': Category.objects.all(), 'institutions': Institution.objects.all(), 'error': str(e)})
 
 
 class FormConfirmationView(View):

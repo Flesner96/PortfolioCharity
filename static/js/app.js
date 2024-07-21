@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function() {
    */
   class FormSteps {
     constructor(form) {
-      this.$form = form;
+      this.$form = form.querySelector('form'); // Zmieniono tutaj, aby odnosić się do właściwego elementu form
       this.$next = form.querySelectorAll(".next-step");
       this.$prev = form.querySelectorAll(".prev-step");
       this.$step = form.querySelector(".form--steps-counter span");
@@ -200,19 +200,12 @@ document.addEventListener("DOMContentLoaded", function() {
       this.init();
     }
 
-    /**
-     * Init all methods
-     */
     init() {
       this.events();
       this.updateForm();
     }
 
-    /**
-     * All events that are happening in form
-     */
     events() {
-      // Next step
       this.$next.forEach(btn => {
         btn.addEventListener("click", e => {
           e.preventDefault();
@@ -224,7 +217,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
       });
 
-      // Previous step
       this.$prev.forEach(btn => {
         btn.addEventListener("click", e => {
           e.preventDefault();
@@ -233,18 +225,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
       });
 
-      // Form submit
-      this.$form.querySelector("form").addEventListener("submit", e => this.submit(e));
+      this.$form.addEventListener("submit", e => this.submit(e));
     }
 
-    /**
-     * Update form front-end
-     * Show next or previous section etc.
-     */
     updateForm() {
       this.$step.innerText = this.currentStep;
-
-      // TODO: Validation
 
       this.slides.forEach(slide => {
         slide.classList.remove("active");
@@ -257,27 +242,18 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
       this.$step.parentElement.hidden = this.currentStep >= 6;
 
-      // Filter institutions based on selected categories
       if (this.currentStep == 3) {
         const selectedCategories = [...this.$form.querySelectorAll('[data-step="1"] input[type="checkbox"]:checked')]
           .map(input => input.value);
 
-        console.log('Selected Categories:', selectedCategories);
-
         this.$form.querySelectorAll('.institution').forEach(institution => {
           const institutionCategories = institution.dataset.categories.split(',');
-          console.log('Institution Categories:', institutionCategories);
           const isVisible = selectedCategories.some(category => institutionCategories.includes(category));
           institution.style.display = isVisible ? 'block' : 'none';
         });
       }
-
-      // TODO: get data from inputs and show them in summary
     }
 
-    /**
-     * Collect data from the form and show them in summary
-     */
     collectSummaryData() {
       const summary = {
         categories: [],
@@ -287,26 +263,18 @@ document.addEventListener("DOMContentLoaded", function() {
           street: '',
           city: '',
           postcode: '',
-          phone: '',
+          phone: ''
         },
         pickup: {
           date: '',
           time: '',
-          more_info: '',
-        },
+          more_info: ''
+        }
       };
 
-      // Pobierz wybrane organizacje
       const organizationInput = this.$form.querySelector('input[name="organization"]:checked');
       if (organizationInput) {
-        console.log('organizationInput:', organizationInput);
-        const organizationDescription = organizationInput.nextElementSibling.nextElementSibling;
-        console.log('organizationDescription:', organizationDescription);
-        const organizationTitle = organizationDescription ? organizationDescription.querySelector('.title') : null;
-        console.log('organizationTitle:', organizationTitle);
-        if (organizationTitle) {
-          summary.organization = organizationTitle.innerText.trim();
-        }
+        summary.organization = organizationInput.nextElementSibling.nextElementSibling.querySelector('.title').innerText;
       }
 
       summary.address.street = this.$form.querySelector('input[name="address"]').value;
@@ -361,17 +329,19 @@ document.addEventListener("DOMContentLoaded", function() {
       `;
     }
 
-    /**
-     * Submit form
-     *
-     * TODO: validation, send data to server
-     */
     submit(e) {
       e.preventDefault();
       this.currentStep++;
       this.updateForm();
+
+      // Możesz tutaj dodać logowanie danych do konsoli lub inne działania
+      console.log('Submitting form');
+
+      // Zmieńmy sposób wywołania submit
+      this.$form.submit();
     }
   }
+
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);
