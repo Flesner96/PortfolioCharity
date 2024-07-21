@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Ustawienia użytkownika</h2>
+    
+    <h3>Edytuj profil</h3>
+    <form method="post" action="{% url 'user-settings' %}">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        <button type="submit" name="update_profile" class="btn">Zapisz zmiany</button>
+    </form>
+    
+    <h3>Zmień hasło</h3>
+    <form method="post" action="{% url 'user-settings' %}">
+        {% csrf_token %}
+        {{ password_form.as_p }}
+        <button type="submit" name="change_password" class="btn">Zmień hasło</button>
+    </form>
+</div>
+{% endblock %}

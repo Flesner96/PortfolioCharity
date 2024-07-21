@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Profil użytkownika{% endblock %}
+
+{% block nav_actions %}
+    {% if user.is_authenticated %}
+        <li><a href="#">Witaj, {{ user.username }}</a>
+            <ul>
+                <li><a href="{% url 'user-profile' %}">Profil</a></li>
+                {% if user.is_superuser %}
+                    <li><a href="/admin/">Panel administracyjny</a></li>
+                {% endif %}
+                <li><a href="{% url 'logout' %}" class="btn btn--small btn--without-border">Wyloguj</a></li>
+            </ul>
+        </li>
+    {% else %}
+        <li><a href="{% url 'login' %}" class="btn btn--small btn--without-border">Zaloguj</a></li>
+        <li><a href="{% url 'register' %}" class="btn btn--small btn--highlighted">Załóż konto</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Profil użytkownika</h2>
+    <p><strong>Imię:</strong> {{ user.first_name }}</p>
+    <p><strong>Nazwisko:</strong> {{ user.last_name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+
+    <h3>Przekazane dary</h3>
+    {% if donations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Liczba worków</th>
+                    <th>Organizacja</th>
+                    <th>Kategorie</th>
+                    <th>Data odbioru</th>
+                    <th>Status</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in donations %}
+                    <tr class="{% if donation.is_taken %}taken{% endif %}">
+                        <td>{{ donation.quantity }}</td>
+                        <td>{{ donation.institution.name }}</td>
+                        <td>
+                            {% for category in donation.categories.all %}
+                                {{ category.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ donation.pick_up_date }} {{ donation.pick_up_time }}</td>
+                        <td>{{ donation.is_taken|yesno:"Zabrane,Niezabrane" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'toggle-donation-status' donation.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn--small">{% if donation.is_taken %}Oznacz jako niezabrane{% else %}Oznacz jako zabrane{% endif %}</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nie przekazałeś jeszcze żadnych darów.</p>
+    {% endif %}
+</div>
+
+<style>
+    .taken {
+        color: gray;
+    }
+</style>
+{% endblock %}

@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from donation.views import LandingPage, Login, Register, logout_view, AddDonationView, FormConfirmationView
+from donation.views import LandingPage, Login, Register, logout_view, AddDonationView, FormConfirmationView, \
+    user_profile, toggle_donation_status, user_settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +28,7 @@ urlpatterns = [
     path('login/', Login.as_view(), name='login'),
     path('register/', Register.as_view(), name='register'),
     path('logout/', logout_view, name='logout'),
+    path('toggle-donation-status/<int:donation_id>/', toggle_donation_status, name='toggle-donation-status'),
+    path('profile/', user_profile, name='user-profile'),
+    path('settings/', user_settings, name='user-settings'),
 ]

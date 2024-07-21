@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth import authenticate, login as auth_login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
@@ -6,9 +6,12 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.db.models import Sum
+from django.views.decorators.http import require_POST
+
+from donation.forms import UserUpdateForm, CustomPasswordChangeForm
 from donation.models import Bag, Institution, Category, Donation
 from django.urls import reverse
-
+from django.contrib import messages
 
 class LandingPage(View):
     def get(self, request):
@@ -136,9 +139,60 @@ class AddDonationView(View):
         except Institution.DoesNotExist:
             return redirect('add-donation')
         except Exception as e:
-            return render(request, 'form.html', {'categories': Category.objects.all(), 'institutions': Institution.objects.all(), 'error': str(e)})
+            return render(request, 'form.html',
+                          {'categories': Category.objects.all(), 'institutions': Institution.objects.all(),
+                           'error': str(e)})
 
 
 class FormConfirmationView(View):
     def get(self, request):
         return render(request, 'form-confirmation.html')
+
+
+@login_required
+def user_profile(request):
+    donations = Donation.objects.filter(user=request.user).select_related('institution').prefetch_related(
+        'categories').order_by('is_taken', 'pick_up_date')
+    return render(request, 'user_profile.html', {
+        'user': request.user,
+        'donations': donations
+    })
+
+
+@require_POST
+@login_required
+def toggle_donation_status(request, donation_id):
+    try:
+        donation = Donation.objects.get(id=donation_id, user=request.user)
+        donation.is_taken = not donation.is_taken
+        donation.save()
+    except Donation.DoesNotExist:
+        pass
+    return redirect('user-profile')
+
+
+@login_required
+def user_settings(request):
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        password_form = CustomPasswordChangeForm(request.user, request.POST)
+
+        if 'update_profile' in request.POST:
+            if user_form.is_valid():
+                user_form.save()
+                messages.success(request, 'Twoje dane zostały zaktualizowane.')
+                return redirect('user-settings')
+        elif 'change_password' in request.POST:
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Pozostanie zalogowanym po zmianie hasła
+                messages.success(request, 'Twoje hasło zostało zaktualizowane.')
+                return redirect('user-settings')
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        password_form = CustomPasswordChangeForm(request.user)
+
+    return render(request, 'user_settings.html', {
+        'user_form': user_form,
+        'password_form': password_form
+    })
