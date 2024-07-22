@@ -20,55 +20,33 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<section class="profile">
     <h2>Profil użytkownika</h2>
-    <p><strong>Imię:</strong> {{ user.first_name }}</p>
-    <p><strong>Nazwisko:</strong> {{ user.last_name }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-
-    <h3>Przekazane dary</h3>
-    {% if donations %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Liczba worków</th>
-                    <th>Organizacja</th>
-                    <th>Kategorie</th>
-                    <th>Data odbioru</th>
-                    <th>Status</th>
-                    <th>Akcje</th>
-                </tr>
-            </thead>
-            <tbody>
+    <div class="container container--85">
+        <div class="user-details">
+            <h3>Imię: {{ user.first_name }}</h3>
+            <h3>Nazwisko: {{ user.last_name }}</h3>
+            <h3>Email: {{ user.email }}</h3>
+        </div>
+        <div class="donations">
+            <h3>Przekazane dary</h3>
+            <ul>
                 {% for donation in donations %}
-                    <tr class="{% if donation.is_taken %}taken{% endif %}">
-                        <td>{{ donation.quantity }}</td>
-                        <td>{{ donation.institution.name }}</td>
-                        <td>
-                            {% for category in donation.categories.all %}
-                                {{ category.name }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>{{ donation.pick_up_date }} {{ donation.pick_up_time }}</td>
-                        <td>{{ donation.is_taken|yesno:"Zabrane,Niezabrane" }}</td>
-                        <td>
-                            <form method="post" action="{% url 'toggle-donation-status' donation.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn--small">{% if donation.is_taken %}Oznacz jako niezabrane{% else %}Oznacz jako zabrane{% endif %}</button>
-                            </form>
-                        </td>
-                    </tr>
+                    <li style="color: {% if donation.is_taken %}gray{% endif %};">
+                        <span>{{ donation.quantity }} worki</span>
+                        <span>{{ donation.institution.name }}</span>
+                        <span>{{ donation.categories.all|join:", " }}</span>
+                        <span>{{ donation.pick_up_date }}</span>
+                        <span>{{ donation.pick_up_time }}</span>
+                        <span>{{ donation.is_taken|yesno:"Zabrane,Niezabrane" }}</span>
+                        <form method="post" action="{% url 'toggle-donation-status' donation.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn--small">{% if donation.is_taken %}Oznacz jako niezabrane{% else %}Oznacz jako zabrane{% endif %}</button>
+                        </form>
+                    </li>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>Nie przekazałeś jeszcze żadnych darów.</p>
-    {% endif %}
-</div>
-
-<style>
-    .taken {
-        color: gray;
-    }
-</style>
+            </ul>
+        </div>
+    </div>
+</section>
 {% endblock %}
